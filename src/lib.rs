@@ -1,4 +1,5 @@
-use num_bigint::BigUint;
+use num_bigint::{BigUint, RandBigInt};
+use rand;
 
 /// alpha^x mod p
 /// output = n^exponent mod modulus
@@ -40,6 +41,14 @@ pub fn verify(
     let cond1 = *r1 == (aplha.modpow(s, p) * y1.modpow(c, p)).modpow(&BigUint::from(1u32), p);
     let cond2 = *r2 == (beta.modpow(s, p) * y2.modpow(c, p)).modpow(&BigUint::from(1u32), p);
     cond1 && cond2
+}
+
+
+pub fn generate_random_below(
+    bound: &BigUint
+) -> BigUint {
+    let mut rng = rand::thread_rng();
+    rng.gen_bigint_below(bound)
 }
 
 #[cfg(test)]
@@ -90,6 +99,38 @@ mod test {
         let s_fake: BigUint = solve(&k, &c, &x_fake, &q);
         let result_fake = verify(&r1, &r2, &y1, &y2, &_alpha, &beta, &c, &s_fake, &p);
         assert!(!result_fake);
+
+    }
+
+    #[test]
+    fn test_toy_example_with_random_numbers() {
+        // all the constants
+        let _alpha:BigUint = BigUint::from(4u32);
+        let beta:BigUint = BigUint::from(9u32);
+        let p:BigUint = BigUint::from(23u32); // prime order
+        let q:BigUint = BigUint::from(11u32);  // group order
+
+        // secret
+        let x:BigUint = BigUint::from(6u32);
+
+        // Random constant value
+        let k:BigUint = generate_random_below(&q);
+
+
+        // Challene: verifier side
+        let c:BigUint = generate_random_below(&q);
+
+        // Compute the y1 and y2
+        // y1 = alpha^x mod p
+        // y2 = beta^x mod p
+        let y1 = exponentiate(&_alpha, &x, &p);
+        let y2 = exponentiate(&beta, &x, &p);
+        let r1 = exponentiate(&_alpha, &k, &p);
+        let r2 = exponentiate(&beta, &k, &p);
+        let s: BigUint = solve(&k, &c, &x, &q);
+
+        let result = verify(&r1, &r2, &y1, &y2, &_alpha, &beta, &c, &s, &p);
+        assert!(result);
 
     }
 }
