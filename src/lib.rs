@@ -1,5 +1,5 @@
 use num_bigint::{BigUint, RandBigInt};
-use rand;
+use rand::Rng;
 
 /// alpha^x mod p
 /// output = n^exponent mod modulus
@@ -44,11 +44,10 @@ pub fn verify(
 }
 
 
-pub fn generate_random_below(
-    bound: &BigUint
-) -> BigUint {
+pub fn generate_random_number_below(bound: &BigUint) -> BigUint {
     let mut rng = rand::thread_rng();
-    rng.gen_bigint_below(bound)
+
+    rng.gen_biguint_below(bound)
 }
 
 #[cfg(test)]
@@ -114,11 +113,11 @@ mod test {
         let x:BigUint = BigUint::from(6u32);
 
         // Random constant value
-        let k:BigUint = generate_random_below(&q);
+        let k:BigUint = generate_random_number_below(&q);
 
 
         // Challene: verifier side
-        let c:BigUint = generate_random_below(&q);
+        let c:BigUint = generate_random_number_below(&q);
 
         // Compute the y1 and y2
         // y1 = alpha^x mod p
