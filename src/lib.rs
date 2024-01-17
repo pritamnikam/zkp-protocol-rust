@@ -78,6 +78,14 @@ impl ZKP {
 
         (_alpha, beta, p, q)
     }
+
+    pub fn generate_random_string(size: usize) -> String {
+        rand::thread_rng()
+            .sample_iter(rand::distributions::Alphanumeric)
+            .take(size)
+            .map(char::from)
+            .collect()
+    }
 }
 
 #[cfg(test)]

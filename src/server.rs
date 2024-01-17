@@ -1,3 +1,8 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(unused_mut)]
+#![allow(dead_code)]
+
 use num_bigint::BigUint;
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -17,8 +22,8 @@ use zkp_auth::{
 
 #[derive(Debug, Default)]
 pub struct AuthImpl {
-    pub usersDb: Mutex<HashMap<String, UserInfo>>,
-    pub authIdToUserDb: Mutex<HashMap<String, String>>,
+    pub users_db: Mutex<HashMap<String, UserInfo>>,
+    pub auth_id_to_user_name_db: Mutex<HashMap<String, String>>,
 }
 
 #[derive(Debug, Default)]
@@ -55,8 +60,8 @@ impl Auth for AuthImpl {
         user_info.y1 = BigUint::from_bytes_be(&request.y1);
         user_info.y2 = BigUint::from_bytes_be(&request.y2);
 
-        let mut usersDb = &mut self.usersDb.lock().unwrap();
-        usersDb.insert(user_name, user_info);
+        let mut users_db = &mut self.users_db.lock().unwrap();
+        users_db.insert(user_name, user_info);
 
         Ok(Response::new(RegisterResponse {}))
     }
@@ -68,22 +73,22 @@ impl Auth for AuthImpl {
         let user_name = request.user;
         println!("Processing Challenge Request username: {:?}", user_name);
 
-        let user_info_hashmap = &mut self.usersDb.lock().unwrap();
+        let user_info_hashmap = &mut self.users_db.lock().unwrap();
 
         if let Some(user_info) = user_info_hashmap.get_mut(&user_name) {
             let (_, _, _, q) = ZKP::get_constants();
             let c = ZKP::generate_random_number_below(&q);
-            let auth_id = "asdfghjkl".to_string();
+            let auth_id = ZKP::generate_random_string(12);
 
             user_info.c = c.clone();
             user_info.r1 = BigUint::from_bytes_be(&request.r1);
             user_info.r2 = BigUint::from_bytes_be(&request.r2);
 
-            let auth_id_to_user = &mut self.authIdToUserDb.lock().unwrap();
+            let auth_id_to_user = &mut self.auth_id_to_user_name_db.lock().unwrap();
             auth_id_to_user.insert(auth_id.clone(), user_name.clone());
 
             println!("✅ Successful Challenge Request username: {:?}", user_name);
-            
+
             Ok(Response::new(AuthenticationChallengeResponse {
                 auth_id,
                 c: c.to_bytes_be(),
