@@ -103,8 +103,55 @@ impl Auth for AuthImpl {
     async fn verify_authentication(
         &self,
         request: tonic::Request<AuthenticationAnswerRequest>,
-    ) -> std::result::Result<tonic::Response<AuthenticationChallengeResponse>, tonic::Status> {
-        todo!();
+    ) -> std::result::Result<tonic::Response<AuthenticationAnswerResponse>, tonic::Status> {
+        let request = request.into_inner();
+        let auth_id = request.auth_id;
+        println!("Processing Challenge Solution auth_id: {:?}", auth_id);
+
+        let auth_id_to_user = &mut self.auth_id_to_user_name_db.lock().unwrap();
+        if let Some(user_name) = auth_id_to_user.get_mut(&auth_id) {
+            // todo!()
+
+            let users_db = &mut self.users_db.lock().unwrap();
+            let user_info = users_db
+                .get_mut(user_name)
+                .expect("AuthId not found on hashmap");
+
+            let s = BigUint::from_bytes_be(&request.s);
+            user_info.s = s;
+
+            let (alpha, beta, p, q) = ZKP::get_constants();
+            let zkp = ZKP { p, q, alpha, beta };
+
+            let verification = zkp.verify(
+                &user_info.r1,
+                &user_info.r2,
+                &user_info.y1,
+                &user_info.y2,
+                &user_info.c,
+                &user_info.s,
+            );
+
+            if verification {
+                let session_id = ZKP::generate_random_string(12);
+
+                println!("✅ Correct Challenge Solution username: {:?}", user_name);
+
+                Ok(Response::new(AuthenticationAnswerResponse { session_id }))
+            } else {
+                println!("❌ Wrong Challenge Solution username: {:?}", user_name);
+
+                Err(Status::new(
+                    Code::PermissionDenied,
+                    format!("AuthId: {} bad solution to the challenge", auth_id),
+                ))
+            }
+        } else {
+            Err(Status::new(
+                Code::NotFound,
+                format!("AuthId: {} not found in database", auth_id),
+            ))
+        }
     }
 }
 

@@ -4,14 +4,14 @@ use rand::Rng;
 
 pub struct ZKP {
     /// Prime order
-    p: BigUint,
+    pub p: BigUint,
 
     /// Group order
-    q: BigUint,
+    pub q: BigUint,
 
     /// Generators
-    alpha: BigUint,
-    beta: BigUint,
+    pub alpha: BigUint,
+    pub beta: BigUint,
 }
 
 impl ZKP {

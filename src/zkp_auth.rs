@@ -190,7 +190,7 @@ pub mod auth_client {
             &mut self,
             request: impl tonic::IntoRequest<super::AuthenticationAnswerRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::AuthenticationChallengeResponse>,
+            tonic::Response<super::AuthenticationAnswerResponse>,
             tonic::Status,
         > {
             self.inner
@@ -238,7 +238,7 @@ pub mod auth_server {
             &self,
             request: tonic::Request<super::AuthenticationAnswerRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::AuthenticationChallengeResponse>,
+            tonic::Response<super::AuthenticationAnswerResponse>,
             tonic::Status,
         >;
     }
@@ -424,7 +424,7 @@ pub mod auth_server {
                         T: Auth,
                     > tonic::server::UnaryService<super::AuthenticationAnswerRequest>
                     for VerifyAuthenticationSvc<T> {
-                        type Response = super::AuthenticationChallengeResponse;
+                        type Response = super::AuthenticationAnswerResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,

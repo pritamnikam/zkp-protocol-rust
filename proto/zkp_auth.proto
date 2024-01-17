@@ -53,5 +53,5 @@ message AuthenticationAnswerResponse {
 service Auth {
     rpc Register(RegisterRequest) returns (RegisterResponse) {}
     rpc CreateAuthenticationChallenge(AuthenticationChallengeRequest) returns (AuthenticationChallengeResponse) {}
-    rpc VerifyAuthentication(AuthenticationAnswerRequest) returns (AuthenticationChallengeResponse) {}
+    rpc VerifyAuthentication(AuthenticationAnswerRequest) returns (AuthenticationAnswerResponse) {}
 }
