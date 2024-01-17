@@ -1,4 +1,3 @@
-use hex;
 use num_bigint::{BigUint, RandBigInt};
 use rand::Rng;
 
@@ -34,7 +33,7 @@ impl ZKP {
             return (k - c * x).modpow(&BigUint::from(1u32), &self.q);
         }
 
-        return &self.q - (c * x - k).modpow(&BigUint::from(1u32), &self.q);
+        &self.q - (c * x - k).modpow(&BigUint::from(1u32), &self.q)
     }
 
     /// cond1: r1 = alpha^s * y1^c
@@ -121,14 +120,11 @@ mod test {
         /// Compute the y1 and y2
         /// y1 = alpha^x mod p
         /// y2 = beta^x mod p
-        let y1 = ZKP::exponentiate(&_alpha, &x, &p);
-        let y2 = ZKP::exponentiate(&beta, &x, &p);
-
+        let (y1, y2) = zkp.compute_pair(&x);
         assert_eq!(y1, BigUint::from(2u32));
         assert_eq!(y2, BigUint::from(3u32));
 
-        let r1 = ZKP::exponentiate(&_alpha, &k, &p);
-        let r2 = ZKP::exponentiate(&beta, &k, &p);
+        let (r1, r2) = zkp.compute_pair(&k);
         assert_eq!(r1, BigUint::from(8u32));
         assert_eq!(r2, BigUint::from(4u32));
 
@@ -173,10 +169,11 @@ mod test {
         // Compute the y1 and y2
         // y1 = alpha^x mod p
         // y2 = beta^x mod p
-        let y1 = ZKP::exponentiate(&_alpha, &x, &p);
-        let y2 = ZKP::exponentiate(&beta, &x, &p);
-        let r1 = ZKP::exponentiate(&_alpha, &k, &p);
-        let r2 = ZKP::exponentiate(&beta, &k, &p);
+        let (y1, y2) = zkp.compute_pair(&x);
+        assert_eq!(y1, BigUint::from(2u32));
+        assert_eq!(y2, BigUint::from(3u32));
+
+        let (r1, r2) = zkp.compute_pair(&k);
         let s: BigUint = zkp.solve(&k, &c, &x);
 
         let result = zkp.verify(&r1, &r2, &y1, &y2, &c, &s);
@@ -235,10 +232,8 @@ mod test {
         // Compute the y1 and y2
         // y1 = alpha^x mod p
         // y2 = beta^x mod p
-        let y1 = ZKP::exponentiate(&_alpha, &x, &p);
-        let y2 = ZKP::exponentiate(&beta, &x, &p);
-        let r1 = ZKP::exponentiate(&_alpha, &k, &p);
-        let r2 = ZKP::exponentiate(&beta, &k, &p);
+        let (y1, y2) = zkp.compute_pair(&x);
+        let (r1, r2) = zkp.compute_pair(&k);
         let s: BigUint = zkp.solve(&k, &c, &x);
 
         let result = zkp.verify(&r1, &r2, &y1, &y2, &c, &s);
@@ -315,10 +310,8 @@ mod test {
         // Compute the y1 and y2
         // y1 = alpha^x mod p
         // y2 = beta^x mod p
-        let y1 = ZKP::exponentiate(&_alpha, &x, &p);
-        let y2 = ZKP::exponentiate(&beta, &x, &p);
-        let r1 = ZKP::exponentiate(&_alpha, &k, &p);
-        let r2 = ZKP::exponentiate(&beta, &k, &p);
+        let (y1, y2) = zkp.compute_pair(&x);
+        let (r1, r2) = zkp.compute_pair(&k);
         let s: BigUint = zkp.solve(&k, &c, &x);
 
         let result = zkp.verify(&r1, &r2, &y1, &y2, &c, &s);

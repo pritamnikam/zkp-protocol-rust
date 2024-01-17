@@ -146,6 +146,7 @@ impl Auth for AuthImpl {
                     format!("AuthId: {} bad solution to the challenge", auth_id),
                 ))
             }
+
         } else {
             Err(Status::new(
                 Code::NotFound,
