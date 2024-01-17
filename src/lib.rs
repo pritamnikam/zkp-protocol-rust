@@ -1,6 +1,6 @@
+use hex;
 use num_bigint::{BigUint, RandBigInt};
 use rand::Rng;
-use hex;
 
 pub struct ZKP {
     /// Prime order
