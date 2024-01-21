@@ -5,8 +5,8 @@ pub mod zkp_auth {
 use num_bigint::BigUint;
 use std::io::stdin;
 use zkp_auth::{
-    auth_client::AuthClient,
-    AuthenticationAnswerRequest, AuthenticationChallengeRequest, RegisterRequest,
+    auth_client::AuthClient, AuthenticationAnswerRequest, AuthenticationChallengeRequest,
+    RegisterRequest,
 };
 use zkp_chaum_pedersen::ZKP;
 
